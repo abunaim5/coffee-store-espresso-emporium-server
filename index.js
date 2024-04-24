@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -28,16 +28,23 @@ async function run() {
 
     const coffeesCollection = client.db("coffeesDB").collection("coffees");
 
-    app.get('/coffees', async(req, res) =>{
-        const result = await coffeesCollection.find().toArray();
-        res.send(result);
+    app.get('/coffees', async (req, res) => {
+      const result = await coffeesCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get('/coffees/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await coffeesCollection.findOne(query);
+      res.send(result);
     })
 
-    app.post('/coffees', async(req, res) =>{
-        const coffee = req.body;
-        const result = await coffeesCollection.insertOne(coffee);
-        res.send(result);
-        console.log(coffee);
+    app.post('/coffees', async (req, res) => {
+      const coffee = req.body;
+      const result = await coffeesCollection.insertOne(coffee);
+      res.send(result);
+      console.log(coffee);
     })
 
     // Send a ping to confirm a successful connection
@@ -52,9 +59,9 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Coffee Store Server Is Running');
+  res.send('Coffee Store Server Is Running');
 });
 
 app.listen(port, () => {
-    console.log(`Coffee store server running on port ${port}`)
+  console.log(`Coffee store server running on port ${port}`)
 })
